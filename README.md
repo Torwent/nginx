@@ -1,2 +1,3 @@
 # nginx
- Nginx docker reverse proxy
+
+Nginx docker reverse proxy with portainer
