@@ -1,4 +1,4 @@
-version: "3.9"
+version: 3.9
 
 services:
   nginx:
@@ -32,7 +32,7 @@ services:
       - hive
 
   certbot:
-    container_name: "certbot"
+    container_name: certbot
     image: certbot/dns-cloudflare:latest
     command: renew --dns-cloudflare
     volumes:
@@ -42,15 +42,14 @@ services:
       - /docker/var/log/letsencrypt:/var/log/letsencrypt
 
   certbot-restarter:
-    container_name: "certbot-restarter"
+    container_name: certbot-restarter
     image: docker
-    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     command:
-      [
-        "/bin/sh",
-        "-c",
-        "while true; do sleep 86400; docker restart certbot; done",
-      ]
+      - /bin/sh
+      - -c
+      - while true; do sleep 86400; docker restart certbot; done
     restart: unless-stopped
 
 networks:
