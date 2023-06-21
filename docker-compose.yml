@@ -6,6 +6,7 @@ services:
     image: nginx
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./logs:/var/log/nginx
       - /docker/etc/letsencrypt/live/waspscripts.com/cert.pem:/etc/letsencrypt/live/waspscripts.com/cert.pem
       - /docker/etc/letsencrypt/live/waspscripts.com/fullchain.pem:/etc/letsencrypt/live/waspscripts.com/fullchain.pem
       - /docker/etc/letsencrypt/live/waspscripts.com/privkey.pem:/etc/letsencrypt/live/waspscripts.com/privkey.pem
