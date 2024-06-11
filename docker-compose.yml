@@ -1,9 +1,28 @@
-version: "3.9"
-
 services:
+  certbot:
+    container_name: certbot
+    image: certbot/dns-cloudflare:latest
+    command: >- #renew --dns-cloudflare
+      certonly --dns-cloudflare
+      --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini
+      --dns-cloudflare-propagation-seconds 15
+      --email torwent@waspscripts.com
+      --agree-tos --no-eff-email
+      --force-renewal
+      -d waspscripts.com
+      -d *.waspscripts.com
+    volumes:
+      - /docker/etc/letsencrypt:/etc/letsencrypt
+      - /docker/var/lib/letsencrypt:/var/lib/letsencrypt
+      - /docker/data/letsencrypt:/data/letsencrypt
+      - /docker/var/log/letsencrypt:/var/log/letsencrypt
+
   nginx:
     container_name: nginx
     image: nginx
+    depends_on:
+      certbot:
+        condition: service_completed_successfully
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./logs:/var/log/nginx
@@ -30,19 +49,12 @@ services:
     networks:
       - hive
 
-  certbot:
-    container_name: certbot
-    image: certbot/dns-cloudflare:latest
-    command: renew --dns-cloudflare
-    volumes:
-      - /docker/etc/letsencrypt:/etc/letsencrypt
-      - /docker/var/lib/letsencrypt:/var/lib/letsencrypt
-      - /docker/data/letsencrypt:/data/letsencrypt
-      - /docker/var/log/letsencrypt:/var/log/letsencrypt
-
   certbot-restarter:
     container_name: certbot-restarter
     image: docker
+    depends_on:
+      certbot:
+        condition: service_completed_successfully
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command:
